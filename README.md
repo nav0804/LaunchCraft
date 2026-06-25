@@ -76,13 +76,13 @@ Tired of writing boilerplate `Dockerfile`s, configuring `docker-compose.yml` net
 
 ### From the Marketplace
 
-Search for **LaunchCraft** in the VS Code Extensions panel (`Ctrl+Shift+X`) or install directly from the [Marketplace page](https://marketplace.visualstudio.com/items?itemName=your-publisher-id.launchcraft).
+Search for **LaunchCraft** in the VS Code Extensions panel (`Ctrl+Shift+X`) or install directly from the [Marketplace page](https://marketplace.visualstudio.com/items?itemName=navneet-anand.launchcraft).
 
 ### Local Development
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/launchcraft.git
+git clone https://github.com/nav0804/launchcraft.git
 cd launchcraft
 
 # 2. Install dependencies
@@ -156,8 +156,8 @@ Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information
 ## 👤 Author
 
 **Navneet Anand Mishra**  
-[![GitHub](https://img.shields.io/badge/GitHub-navneetanand-black?logo=github)](https://github.com/yourusername)  
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-navneetanand-blue?logo=linkedin)](https://linkedin.com/in/yourprofile)
+[![GitHub](https://img.shields.io/badge/GitHub-navneetanand-black?logo=github)](https://github.com/nav0804/LaunchCraft)  
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-navneetanand-blue?logo=linkedin)](https://www.linkedin.com/in/navneet-anand-432a551a4/)
 
 ---
 
