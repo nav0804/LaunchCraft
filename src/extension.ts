@@ -1,0 +1,68 @@
+import * as vscode from "vscode";
+import { buildDetectorChain } from "./detector/DetectorChain";
+import { GeneratorFactory } from "./generators/GeneratorFactory";
+import { TemplateRegistry } from "./templates/registry/TemplateRegistry";
+import { NodeDockerfileTemplate } from "./templates/node/Dockfile.template";
+import { runMenuFlow } from "./menus/MenuFlow";
+import { NodeComposeTemplate } from "./templates/node/Docker-compose.template";
+import { ReactDockerfileTemplate } from "./templates/node/ReactDockerfile.template";
+import { ReactComposeTemplate } from "./templates/node/ReactCompose.template";
+
+export function activate(context: vscode.ExtensionContext) {
+  // 1. Register Templates on startup
+  TemplateRegistry.register("dockerfile:node", NodeDockerfileTemplate);
+  TemplateRegistry.register("compose:node", NodeComposeTemplate);
+
+  TemplateRegistry.register("dockerfile:node:react", ReactDockerfileTemplate);
+  TemplateRegistry.register("compose:node:react", ReactComposeTemplate);
+
+  // 2. Register Command
+  let disposable = vscode.commands.registerCommand(
+    "devlaunch.initialize",
+    async () => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (!workspaceFolders) {
+        vscode.window.showErrorMessage(
+          "DevLaunch: Please open a project folder first!"
+        );
+        return;
+      }
+
+      const rootUri = workspaceFolders[0].uri;
+
+      // Step 1: Detect
+      const detectorChain = buildDetectorChain();
+      const detectedProfile = await detectorChain.detect(rootUri);
+
+      if (!detectedProfile || detectedProfile.language === "unknown") {
+        vscode.window.showErrorMessage(
+          "DevLaunch: Could not detect a supported tech stack."
+        );
+        return;
+      }
+
+      // Step 2: Menus
+      const userChoices = await runMenuFlow(detectedProfile);
+      if (!userChoices) {
+        return; // User cancelled
+      }
+
+      // Step 3: Generate & Write
+      try {
+        const generators = GeneratorFactory.build(userChoices);
+        for (const generator of generators) {
+          await generator.write(userChoices, rootUri);
+        }
+        vscode.window.showInformationMessage(
+          "🚀 DevLaunch: Dockerfile generated successfully!"
+        );
+      } catch (error: any) {
+        vscode.window.showErrorMessage(`DevLaunch Error: ${error.message}`);
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
+}
+
+export function deactivate() {}
