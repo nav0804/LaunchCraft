@@ -2,15 +2,15 @@
   "name": "launchcraft",
   "displayName": "LaunchCraft",
   "description": "Stack-aware auto-generation of Docker, CI/CD, and deployment configs. Skip manual deployment setup",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "icon": "assets/icon.png",
   "publisher": "navneet-anand",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/launchcraft"
+    "url": "https://github.com/nav0804/launchcraft"
   },
   "engines": {
-    "vscode": "^1.125.0"
+    "vscode": "^1.94.0"
   },
   "categories": [
     "Other"
