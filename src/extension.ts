@@ -7,14 +7,40 @@ import { runMenuFlow } from "./menus/MenuFlow";
 import { NodeComposeTemplate } from "./templates/node/Docker-compose.template";
 import { ReactDockerfileTemplate } from "./templates/node/ReactDockerfile.template";
 import { ReactComposeTemplate } from "./templates/node/ReactCompose.template";
+import { SpringBootDockerfileTemplate } from "./templates/springboot/SpringBootDockerfile.template";
+import { GoDockerfileTemplate } from "./templates/go/GoDockerfile.template";
+import { NodeJenkinsTemplate } from "./templates/node/NodeJenkinsfile.template";
+import { Logger } from "./utils/logger";
 
 export function activate(context: vscode.ExtensionContext) {
   // 1. Register Templates on startup
-  TemplateRegistry.register("dockerfile:node", NodeDockerfileTemplate);
-  TemplateRegistry.register("compose:node", NodeComposeTemplate);
+  Logger.initialize("LaunchCraft");
+  Logger.info("Extension activated and ready.");
 
+  // --- NODE (EXPRESS) ---
+  TemplateRegistry.register("dockerfile:node:express", NodeDockerfileTemplate);
+  TemplateRegistry.register("compose:node:express", NodeComposeTemplate);
+  TemplateRegistry.register("jenkins:node:express", NodeJenkinsTemplate);
+
+  // --- NODE (REACT) ---
   TemplateRegistry.register("dockerfile:node:react", ReactDockerfileTemplate);
   TemplateRegistry.register("compose:node:react", ReactComposeTemplate);
+  TemplateRegistry.register("jenkins:node:react", NodeJenkinsTemplate);
+
+  // --- JAVA (SPRING BOOT) ---
+  TemplateRegistry.register(
+    "dockerfile:java:springboot",
+    SpringBootDockerfileTemplate
+  );
+  // Reusing Node templates as fallbacks just to prevent crashes during testing!
+  /**
+   * We will have to call the sprinboot template here.
+   */
+  // TemplateRegistry.register("compose:java:springboot", NodeComposeTemplate);
+  // TemplateRegistry.register("jenkins:java:springboot", NodeJenkinsTemplate);
+
+  // --- GO ---
+  TemplateRegistry.register("dockerfile:go:none", GoDockerfileTemplate);
 
   // 2. Register Command
   let disposable = vscode.commands.registerCommand(
@@ -54,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
           await generator.write(userChoices, rootUri);
         }
         vscode.window.showInformationMessage(
-          "🚀 DevLaunch: Dockerfile generated successfully!"
+          "🚀 DevLaunch: Dockerfile generated! (Note: Please verify the Java/Node versions in the generated files match your project)"
         );
       } catch (error: any) {
         vscode.window.showErrorMessage(`DevLaunch Error: ${error.message}`);
