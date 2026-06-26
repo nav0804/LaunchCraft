@@ -2,7 +2,7 @@
   "name": "launchcraft",
   "displayName": "LaunchCraft",
   "description": "Stack-aware auto-generation of Docker, CI/CD, and deployment configs. Skip manual deployment setup",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "assets/icon.png",
   "publisher": "navneet-anand",
   "repository": {
@@ -50,7 +50,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "^1.94.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
     "typescript-eslint": "^8.61.1",
