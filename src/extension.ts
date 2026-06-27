@@ -1,22 +1,64 @@
 import * as vscode from "vscode";
-import { buildDetectorChain } from "./detector/DetectorChain";
-import { GeneratorFactory } from "./generators/GeneratorFactory";
+import { Logger } from "./utils/logger";
 import { TemplateRegistry } from "./templates/registry/TemplateRegistry";
-import { NodeDockerfileTemplate } from "./templates/node/Dockfile.template";
+import { NodeDockerfileTemplate } from "./templates/javascript/express/ExpressDockerfile.template";
+import { NodeJenkinsTemplate } from "./templates/javascript/express/ExpressJenkins.template";
+import { TsDockerfileTemplate } from "./templates/typescript/express/TsExpressDockerfile.template";
+import { ReactDockerfileTemplate } from "./templates/javascript/react/ReactDockerfile.template";
+import { ReactComposeTemplate } from "./templates/javascript/react/ReactCompose.template";
+import { SpringBootDockerfileTemplate } from "./templates/java/springboot/SpringBootDockerfile.template";
+import { buildDetectorChain } from "./detector/DetectorChain";
 import { runMenuFlow } from "./menus/MenuFlow";
-import { NodeComposeTemplate } from "./templates/node/Docker-compose.template";
-import { ReactDockerfileTemplate } from "./templates/node/ReactDockerfile.template";
-import { ReactComposeTemplate } from "./templates/node/ReactCompose.template";
+import { GeneratorFactory } from "./generators/GeneratorFactory";
+import { UserChoices } from "./types";
+import { ExpressComposeTemplate } from "./templates/javascript/express/ExpressCompose.template";
 
 export function activate(context: vscode.ExtensionContext) {
-  // 1. Register Templates on startup
-  TemplateRegistry.register("dockerfile:node", NodeDockerfileTemplate);
-  TemplateRegistry.register("compose:node", NodeComposeTemplate);
+  Logger.initialize("LaunchCraft");
+  Logger.info("Extension activated and ready.");
 
-  TemplateRegistry.register("dockerfile:node:react", ReactDockerfileTemplate);
-  TemplateRegistry.register("compose:node:react", ReactComposeTemplate);
+  // --- NODE (EXPRESS) ---
 
-  // 2. Register Command
+  TemplateRegistry.register(
+    "dockerfile:javascript:express",
+    NodeDockerfileTemplate
+  );
+  TemplateRegistry.register(
+    "compose:javascript:express",
+    ExpressComposeTemplate
+  );
+  TemplateRegistry.register("jenkins:javascript:express", NodeJenkinsTemplate);
+
+  TemplateRegistry.register(
+    "dockerfile:typescript:express",
+    TsDockerfileTemplate
+  );
+  TemplateRegistry.register(
+    "compose:typescript:express",
+    ExpressComposeTemplate
+  ); 
+  TemplateRegistry.register("jenkins:typescript:express", NodeJenkinsTemplate);
+
+  TemplateRegistry.register(
+    "dockerfile:javascript:react",
+    ReactDockerfileTemplate
+  );
+  TemplateRegistry.register("compose:javascript:react", ReactComposeTemplate);
+  TemplateRegistry.register("jenkins:javascript:react", NodeJenkinsTemplate);
+
+  TemplateRegistry.register(
+    "dockerfile:java:springboot",
+    SpringBootDockerfileTemplate
+  );
+  /**
+   * We will have to call the sprinboot template here.
+   */
+  // TemplateRegistry.register("compose:java:springboot", NodeComposeTemplate);
+  // TemplateRegistry.register("jenkins:java:springboot", NodeJenkinsTemplate);
+
+  // --- GO ---
+  // TemplateRegistry.register("dockerfile:go:none", GoDockerfileTemplate);
+
   let disposable = vscode.commands.registerCommand(
     "devlaunch.initialize",
     async () => {
@@ -30,7 +72,6 @@ export function activate(context: vscode.ExtensionContext) {
 
       const rootUri = workspaceFolders[0].uri;
 
-      // Step 1: Detect
       const detectorChain = buildDetectorChain();
       const detectedProfile = await detectorChain.detect(rootUri);
 
@@ -41,20 +82,18 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // Step 2: Menus
       const userChoices = await runMenuFlow(detectedProfile);
       if (!userChoices) {
-        return; // User cancelled
+        return;
       }
 
-      // Step 3: Generate & Write
       try {
         const generators = GeneratorFactory.build(userChoices);
         for (const generator of generators) {
           await generator.write(userChoices, rootUri);
         }
         vscode.window.showInformationMessage(
-          "🚀 DevLaunch: Dockerfile generated successfully!"
+          "🚀 DevLaunch: Dockerfile generated! (Note: Please verify the Java/Node versions in the generated files match your project)"
         );
       } catch (error: any) {
         vscode.window.showErrorMessage(`DevLaunch Error: ${error.message}`);

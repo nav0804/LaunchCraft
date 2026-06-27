@@ -1,4 +1,4 @@
-import { UserChoices } from "../../types";
+import { UserChoices } from "../../../types";
 
 export const ReactComposeTemplate = (choices: UserChoices) =>
   `
