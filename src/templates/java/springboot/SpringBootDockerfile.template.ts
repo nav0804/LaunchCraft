@@ -1,27 +1,33 @@
 import { UserChoices } from "../../../types";
 
-export const SpringBootDockerfileTemplate = (choices: UserChoices) =>
-  `
-
+export const SpringBootDockerfileTemplate = (choices: UserChoices) => {
+  return `
 # ==========================================
-# ⚠️ DEVLAUNCH TODO: VERIFY JAVA VERSION
-# This template defaults to Java 17. 
-# If your pom.xml uses Java 21, change the '17' below to '21'.
+# Stage 1: Build the Application
 # ==========================================
-# Stage 1: Build the application
 FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /app
+
+# Copy the pom.xml and download dependencies first (caching optimization)
 COPY pom.xml .
 RUN mvn dependency:go-offline
-COPY src ./src
-# Build the jars, then immediately delete the useless plain jar so Docker doesn't copy it
-RUN mvn clean package -DskipTests && rm target/*-plain.jar || true
 
-# Stage 2: Run the application
-FROM eclipse-temurin:21-jre-jammy
+# Copy source code and build the fat JAR
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# ==========================================
+# Stage 2: Production Runtime
+# ==========================================
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-# Now the wildcard will strictly grab the correct Fat Jar
+
+# Copy ONLY the built fat JAR from the builder stage
 COPY --from=builder /app/target/*.jar app.jar
+
+# Standard Spring Boot port
 EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
 `.trim();
+};

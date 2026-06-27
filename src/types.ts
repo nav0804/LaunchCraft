@@ -23,6 +23,12 @@ export interface StackProfile {
     | "unknown";
   framework: string | null;
   hasDockerfile: boolean;
+  dbConfig?: {
+    url?: string;
+    username?: string;
+    password?: string;
+    dbName?: string;
+  };
 }
 
 export interface UserChoices {

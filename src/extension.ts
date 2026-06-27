@@ -12,12 +12,11 @@ import { runMenuFlow } from "./menus/MenuFlow";
 import { GeneratorFactory } from "./generators/GeneratorFactory";
 import { UserChoices } from "./types";
 import { ExpressComposeTemplate } from "./templates/javascript/express/ExpressCompose.template";
+import { SpringBootComposeTemplate } from "./templates/java/springboot/SpringBootComposefile.template";
 
 export function activate(context: vscode.ExtensionContext) {
   Logger.initialize("LaunchCraft");
   Logger.info("Extension activated and ready.");
-
-  // --- NODE (EXPRESS) ---
 
   TemplateRegistry.register(
     "dockerfile:javascript:express",
@@ -36,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
   TemplateRegistry.register(
     "compose:typescript:express",
     ExpressComposeTemplate
-  ); 
+  );
   TemplateRegistry.register("jenkins:typescript:express", NodeJenkinsTemplate);
 
   TemplateRegistry.register(
@@ -50,11 +49,10 @@ export function activate(context: vscode.ExtensionContext) {
     "dockerfile:java:springboot",
     SpringBootDockerfileTemplate
   );
-  /**
-   * We will have to call the sprinboot template here.
-   */
-  // TemplateRegistry.register("compose:java:springboot", NodeComposeTemplate);
-  // TemplateRegistry.register("jenkins:java:springboot", NodeJenkinsTemplate);
+  TemplateRegistry.register(
+    "compose:java:springboot",
+    SpringBootComposeTemplate
+  );
 
   // --- GO ---
   // TemplateRegistry.register("dockerfile:go:none", GoDockerfileTemplate);

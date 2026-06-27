@@ -2,7 +2,7 @@ import { IDatabaseSnippet } from "./IDatabaseSnippet";
 
 export const MongoSnippet: IDatabaseSnippet = {
   serviceName: "mongo",
-  serviceYaml: `
+  serviceYaml: (dbName: string, password: string) => `
   mongo:
     image: mongo:latest
     ports:
@@ -11,5 +11,5 @@ export const MongoSnippet: IDatabaseSnippet = {
       - mongo_data:/data/db`,
   volumeYaml: `
 volumes:
-  mongo_data:`
+  mongo_data:`,
 };

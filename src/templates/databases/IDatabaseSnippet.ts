@@ -1,5 +1,5 @@
 export interface IDatabaseSnippet {
   serviceName: string;
-  serviceYaml: string;
+  serviceYaml: (dbName: string, password: string) => string;
   volumeYaml: string;
 }
