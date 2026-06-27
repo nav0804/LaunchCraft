@@ -1,38 +1,55 @@
 import * as vscode from "vscode";
-import { buildDetectorChain } from "./detector/DetectorChain";
-import { GeneratorFactory } from "./generators/GeneratorFactory";
-import { TemplateRegistry } from "./templates/registry/TemplateRegistry";
-import { NodeDockerfileTemplate } from "./templates/node/Dockfile.template";
-import { runMenuFlow } from "./menus/MenuFlow";
-import { NodeComposeTemplate } from "./templates/node/Docker-compose.template";
-import { ReactDockerfileTemplate } from "./templates/node/ReactDockerfile.template";
-import { ReactComposeTemplate } from "./templates/node/ReactCompose.template";
-import { SpringBootDockerfileTemplate } from "./templates/springboot/SpringBootDockerfile.template";
-import { GoDockerfileTemplate } from "./templates/go/GoDockerfile.template";
-import { NodeJenkinsTemplate } from "./templates/node/NodeJenkinsfile.template";
 import { Logger } from "./utils/logger";
+import { TemplateRegistry } from "./templates/registry/TemplateRegistry";
+import { NodeDockerfileTemplate } from "./templates/javascript/express/ExpressDockerfile.template";
+import { NodeJenkinsTemplate } from "./templates/javascript/express/ExpressJenkins.template";
+import { TsDockerfileTemplate } from "./templates/typescript/express/TsExpressDockerfile.template";
+import { ReactDockerfileTemplate } from "./templates/javascript/react/ReactDockerfile.template";
+import { ReactComposeTemplate } from "./templates/javascript/react/ReactCompose.template";
+import { SpringBootDockerfileTemplate } from "./templates/java/springboot/SpringBootDockerfile.template";
+import { buildDetectorChain } from "./detector/DetectorChain";
+import { runMenuFlow } from "./menus/MenuFlow";
+import { GeneratorFactory } from "./generators/GeneratorFactory";
+import { UserChoices } from "./types";
+import { ExpressComposeTemplate } from "./templates/javascript/express/ExpressCompose.template";
 
 export function activate(context: vscode.ExtensionContext) {
-  // 1. Register Templates on startup
   Logger.initialize("LaunchCraft");
   Logger.info("Extension activated and ready.");
 
   // --- NODE (EXPRESS) ---
-  TemplateRegistry.register("dockerfile:node:express", NodeDockerfileTemplate);
-  TemplateRegistry.register("compose:node:express", NodeComposeTemplate);
-  TemplateRegistry.register("jenkins:node:express", NodeJenkinsTemplate);
 
-  // --- NODE (REACT) ---
-  TemplateRegistry.register("dockerfile:node:react", ReactDockerfileTemplate);
-  TemplateRegistry.register("compose:node:react", ReactComposeTemplate);
-  TemplateRegistry.register("jenkins:node:react", NodeJenkinsTemplate);
+  TemplateRegistry.register(
+    "dockerfile:javascript:express",
+    NodeDockerfileTemplate
+  );
+  TemplateRegistry.register(
+    "compose:javascript:express",
+    ExpressComposeTemplate
+  );
+  TemplateRegistry.register("jenkins:javascript:express", NodeJenkinsTemplate);
 
-  // --- JAVA (SPRING BOOT) ---
+  TemplateRegistry.register(
+    "dockerfile:typescript:express",
+    TsDockerfileTemplate
+  );
+  TemplateRegistry.register(
+    "compose:typescript:express",
+    ExpressComposeTemplate
+  ); 
+  TemplateRegistry.register("jenkins:typescript:express", NodeJenkinsTemplate);
+
+  TemplateRegistry.register(
+    "dockerfile:javascript:react",
+    ReactDockerfileTemplate
+  );
+  TemplateRegistry.register("compose:javascript:react", ReactComposeTemplate);
+  TemplateRegistry.register("jenkins:javascript:react", NodeJenkinsTemplate);
+
   TemplateRegistry.register(
     "dockerfile:java:springboot",
     SpringBootDockerfileTemplate
   );
-  // Reusing Node templates as fallbacks just to prevent crashes during testing!
   /**
    * We will have to call the sprinboot template here.
    */
@@ -40,9 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
   // TemplateRegistry.register("jenkins:java:springboot", NodeJenkinsTemplate);
 
   // --- GO ---
-  TemplateRegistry.register("dockerfile:go:none", GoDockerfileTemplate);
+  // TemplateRegistry.register("dockerfile:go:none", GoDockerfileTemplate);
 
-  // 2. Register Command
   let disposable = vscode.commands.registerCommand(
     "devlaunch.initialize",
     async () => {
@@ -56,7 +72,6 @@ export function activate(context: vscode.ExtensionContext) {
 
       const rootUri = workspaceFolders[0].uri;
 
-      // Step 1: Detect
       const detectorChain = buildDetectorChain();
       const detectedProfile = await detectorChain.detect(rootUri);
 
@@ -67,13 +82,11 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // Step 2: Menus
       const userChoices = await runMenuFlow(detectedProfile);
       if (!userChoices) {
-        return; // User cancelled
+        return;
       }
 
-      // Step 3: Generate & Write
       try {
         const generators = GeneratorFactory.build(userChoices);
         for (const generator of generators) {
