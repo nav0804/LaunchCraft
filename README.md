@@ -2,9 +2,8 @@
 
 > **Stack-aware auto-generation of Docker, CI/CD, and deployment configs — right inside VS Code.**
 
-[![Version](https://img.shields.io/visual-studio-marketplace/v/your-publisher-id.launchcraft?color=blue&label=version)](https://marketplace.visualstudio.com/items?itemName=your-publisher-id.launchcraft)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/your-publisher-id.launchcraft)](https://marketplace.visualstudio.com/items?itemName=your-publisher-id.launchcraft)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![VS Code Marketplace](https://img.shields.io/visual-studio-marketplace/v/navneet-anand.launchcraft?color=blue&label=LaunchCraft)](https://marketplace.visualstudio.com/items?itemName=navneet-anand.launchcraft)
 
 Tired of writing boilerplate `Dockerfile`s, configuring `docker-compose.yml` networks, and guessing CI/CD pipeline syntax for every new project? **LaunchCraft** acts as your personal DevOps engineer — it automatically detects your project's framework, asks a few quick questions, and scaffolds your entire deployment infrastructure in seconds.
 
@@ -107,11 +106,22 @@ LaunchCraft is built in TypeScript and engineered around **SOLID principles** wi
 ```
 src/
 ├── detector/          # Chain of Responsibility — detects project stack
+│   └── base/          # Abstract base class for all detectors
 ├── generators/        # Strategy Pattern — one generator per output file type
-│   └── strategies/    # Swappable strategies per language/framework
+│   ├── base/          # Abstract base class for all generators
+│   └── cicd/          # CI/CD pipeline file generator (Jenkins, GitHub Actions)
+├── menus/             # Interactive QuickPick menu orchestration
 ├── templates/         # Raw template strings per stack
-│   └── registry/      # Central TemplateRegistry — register new stacks in one line
-└── GeneratorFactory   # Factory Pattern — assembles the generator pipeline
+│   ├── databases/     # Database compose snippets (Postgres, MySQL, Mongo)
+│   ├── java/
+│   │   └── springboot/    # Spring Boot Dockerfile + Compose templates
+│   ├── javascript/
+│   │   ├── express/       # Express Dockerfile, Compose + Jenkinsfile templates
+│   │   └── react/         # React Dockerfile + Compose templates
+│   ├── registry/      # Central TemplateRegistry — register new stacks in one line
+│   └── typescript/
+│       └── express/       # TypeScript Express Dockerfile template
+└── utils/             # Shared utilities — structured logging
 ```
 
 **Design Patterns used:**
